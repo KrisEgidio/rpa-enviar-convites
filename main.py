@@ -8,19 +8,23 @@ from tkinter import messagebox
 
 def main():
     load_dotenv()
-    get_login_data()
     company_id = os.getenv("COMPANY_LINKEDIN_ID")
     network_url = f"https://www.linkedin.com/company/{company_id}/admin/feed/posts/?invite=true"
     driver = webdriver.Edge()
     start_bot(driver, network_url)
 
-
 def get_login_data():
     """
     Cria uma janela para input de dados do login
 
-    :return: user, password, company_id
+    :return: user, password
     """
+    def on_login_button_click():
+        user = user_var.get()
+        password = password_var.get()
+        window.destroy()  # Fecha a janela
+        return user, password
+
     window = tk.Tk()
     window.title("Login")
 
@@ -28,11 +32,15 @@ def get_login_data():
     label_user = tk.Label(window, text="Usuário:")
     label_password = tk.Label(window, text="Senha:")
 
-    # Crie campos de entrada
-    entry_user = tk.Entry(window)
-    entry_password = tk.Entry(window, show="*")  # A senha é exibida como asteriscos
+    # Crie variáveis de controle para os campos de entrada
+    user_var = tk.StringVar()
+    password_var = tk.StringVar()
 
-    button = tk.Button(window, text="Login")
+    # Crie campos de entrada vinculados às variáveis de controle
+    entry_user = tk.Entry(window, textvariable=user_var)
+    entry_password = tk.Entry(window, show="*", textvariable=password_var)  # A senha é exibida como asteriscos
+
+    button = tk.Button(window, text="Login", command=on_login_button_click)
 
     # Coloque os widgets na janela
     label_user.pack()
@@ -44,22 +52,12 @@ def get_login_data():
     # Inicie a janela
     window.mainloop()
 
-    user = entry_user.get()
-    password = entry_password.get()
-
-    return user, password
-
 def login_to_linkedin(driver):
     """
     void
-    Faz login no linkedin. Caso solicite a verificação de segurança, o usuário deve fazer manualmente.
+    Aguardar o usuário logar.
     """
     driver.get("https://www.linkedin.com/login")
-    user = driver.find_element(By.ID, "username")
-    password = driver.find_element(By.ID, "password")
-    user.send_keys(os.getenv("LINKEDIN_USERNAME"))
-    password.send_keys(os.getenv("LINKEDIN_PASSWORD"))
-    password.submit()
 
     ## Verificando se o usuário está logado ##
     current_url = driver.current_url
