@@ -9,7 +9,12 @@ from tkinter import messagebox
 def main():
     load_dotenv()
     company_id = os.getenv("COMPANY_LINKEDIN_ID")
-    network_url = f"https://www.linkedin.com/company/{company_id}/admin/feed/posts/?invite=true"
+    userIsAdmin = os.getenv("USER_ADMIN")
+    if userIsAdmin == '1':
+        network_url = f"https://www.linkedin.com/company/{company_id}/admin/feed/posts/?invite=true"
+    else:
+        network_url = "https://www.linkedin.com/company/agilizza-hub/?invite=true"
+
     driver = webdriver.Edge()
     start_bot(driver, network_url)
 
@@ -78,7 +83,7 @@ def send_requests_to_users(driver, network_url):
 
     ## Obtendo a quantidade de convites disponíveis para enviar ##
     size = driver.find_element(By.XPATH, "//span[@class='t-14 t-black--light']//span[@class='t-bold']").text
-    sends = int(size.split("/")[0])
+    sends = int(size.split("de")[0])
 
 
 
@@ -111,7 +116,7 @@ def send_requests_to_users(driver, network_url):
     send_button = driver.find_element(By.XPATH,
                                       "//button[@class='artdeco-button artdeco-button--2 artdeco-button--primary ember-view']")
     send_button.click()
-    time.sleep(5)
+    time.sleep(20)
     print("Requests sent successfully")
 
 
